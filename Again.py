@@ -45,27 +45,12 @@ PLAYER_START_Y = 225
 
 EXPLOSION_TEXTURE_COUNT = 60
 
-class Explosion(arcade.Sprite):
-    """ This class is for explosion animation
-    """
-    def __init__(self,texture_list):
-        super().__init__()
-        # Start at the first frame
-        self.current_texture = 0
-        self.textures = texture_list
-    def update(self):
-        self.current_texture += 1
-        if self.current_texture < len(self.textures):
-            self.set_texture(self.current_texture)
-        else:
-            self.remove_from_sprite_lists()
 
 
 class MyGame(arcade.Window):
     """
     Main application class.
     """
-
     def __init__(self):
 
         # Call the parent class and set up the window
@@ -99,7 +84,6 @@ class MyGame(arcade.Window):
         # Load the explosion from a sprite sheet
         self.explosion_texture_list = arcade.load_spritesheet(file_name, sprite_width,sprite_height,columns,count)
 
-
         ## FOREGROUND, BACKGROUND , DO NOT TOUCH LIST
 
         self.background_list = None
@@ -108,11 +92,8 @@ class MyGame(arcade.Window):
 
         # Keep track of the score (Özgür)
         self.score = 0
-
-
         # Separate variable that holds the player sprite
         self.player_sprite = None
-        #self.player_sprite1 = None
 
         # Our physics engine
         self.physics_engine = None
@@ -174,12 +155,6 @@ class MyGame(arcade.Window):
         self.player_sprite.center_y = PLAYER_START_Y
         self.player_list.append(self.player_sprite)
 
-        # sprite 2
-       # image_source1 = "images/player_1/player_stand.png"
-        #self.player_sprite1 = arcade.Sprite(image_source1, CHARACTER_SCALING)
-        #self.player_sprite1.center_x = 200
-        #self.player_sprite1.center_y = 180
-        #self.player_list1.append(self.player_sprite1)
 
         ## --- load in a map from the tilled editor
 
@@ -208,21 +183,16 @@ class MyGame(arcade.Window):
         # -- Foreground
         self.foreground_list = arcade.tilemap.process_layer(my_map,foreground_layer_name,TILE_SCALING)
 
-
-
         # read in the tiled map
         #my_map = arcade.tilemap.read_tmx(map_name)
 
         # Platforms
-
         self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
                                                       layer_name=platform_layer_name,
                                                       scaling=TILE_SCALING,
                                                       use_spatial_hash=True)
-
         # Coins
         self.coin_list = arcade.tilemap.process_layer(my_map, coins_layer_name, TILE_SCALING, use_spatial_hash=True)
-
 
         # --- Dont touch layer
 
@@ -287,64 +257,6 @@ class MyGame(arcade.Window):
         enemy.boundary_left = SPRITE_SIZE *3
         enemy.change_x = 2
         self.enemy_list.append(enemy)
-
-
-        # Add enemey - bee
-        #for x in range(100, 1000, 250):
-            #bee = arcade.Sprite(":resources:images/enemies/bee.png", TILE_SCALING)
-            #bee.center_x = x
-            #bee.center_y = 600
-            #self.enemey_list.append(bee)
-
-        # Add more enemeys
-        #coordinate_list1 = [[256, 250],
-                           #[512, 250],
-                           #[768, 250]]
-
-        #for coordinate in coordinate_list1:
-            # Add a crate on the ground
-            #frog = arcade.Sprite("images/enemies/frog.png", TILE_SCALING)
-            #frog.position = coordinate
-           # self.enemey_list.append(frog)
-
-
-
-
-        # Create the ground
-        # This shows using a loop to place multiple sprites horizontally
-        #for x in range(100, 3000, 64):
-            #wall = arcade.Sprite(":resources:images/tiles/grassMid.png", TILE_SCALING)
-            #wall.center_x = x
-            #wall.center_y = 100
-            #self.wall_list.append(wall)
-
-        # Put some crates on the ground
-        # This shows using a coordinate list to place sprites
-        #coordinate_list = [[256, 160],
-                           #[512, 160],
-                           #[768, 160]]
-
-        #for coordinate in coordinate_list:
-            # Add a crate on the ground
-            #wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", TILE_SCALING)
-            #wall.position = coordinate
-            #self.wall_list.append(wall)
-
-            # The floor is lava!!!
-            # This shows using a loop to place multiple sprites horizontally
-            # Put some lava on the ground
-            # This shows using a coordinate list to place sprites
-        #for x in range(0, 3000, 64):
-            #lava = arcade.Sprite(":resources:images/tiles/lavaTop_high.png", TILE_SCALING)
-            #lava.center_x = x
-            #lava.center_y = 1
-            #self.wall_list.append(lava)
-
-        # Create the 'physics engine'
-        #self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
-                                                             #self.wall_list,
-                                                             #GRAVITY)
-        ## Timers
 
         self.total_time = 0.0
 
@@ -421,11 +333,6 @@ class MyGame(arcade.Window):
         # Add the bullet to the appropriate list
 
         self.bullet_list.append(bullet)
-
-
-
-
-
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
