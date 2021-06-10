@@ -109,6 +109,7 @@ class MyGame(arcade.Window):
         self.background_list = None
         self.foreground_list = None
         self.dont_touch_list = None
+        self.onlylayerlist = None
 
         # Keep track of the score (Özgür)
         self.score = 0
@@ -131,6 +132,8 @@ class MyGame(arcade.Window):
         # Level
         self.level = 1
 
+
+
         # Load sounds (+ Game over + gun sound)
 
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
@@ -145,6 +148,9 @@ class MyGame(arcade.Window):
         ## ADD TIMER
 
         self.total_time = 0.0
+
+        # Load external map
+        self.ground_list = None
 
 
     def setup(self,level): # we add level next to self
@@ -167,6 +173,7 @@ class MyGame(arcade.Window):
         self.coin_list = arcade.SpriteList()
         self.foreground_list = arcade.SpriteList()
         self.background_list = arcade.SpriteList()
+        self.onlylayerlist = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
         self.explosion_list = arcade.SpriteList()
         self.bullet_enemy_list = arcade.SpriteList()
@@ -197,12 +204,16 @@ class MyGame(arcade.Window):
         background_layer_name = "Background"
         # name of the layer that has items we should not touch
         dont_touch_layer_name = "Don't Touch"
+        first_layer_name= "Calque de Tuiles 1"
 
         # MAp name
         map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
+        #map_name = "map2_level_3.tmx"
+
+        my_map = arcade.tilemap.read_tmx(map_name)
 
         # read in the tiled map
-        my_map = arcade.tilemap.read_tmx(map_name)
+        #my_map = arcade.tilemap.read_tmx(map_name)
 
         # calculate the right edge of my_map
         self.end_of_map = my_map.map_size.width * GRID_PIXEL_SIZE
@@ -212,7 +223,7 @@ class MyGame(arcade.Window):
 
         # -- Foreground
         self.foreground_list = arcade.tilemap.process_layer(my_map,foreground_layer_name,TILE_SCALING)
-
+        self.onlylayerlist = arcade.tilemap.process_layer(my_map,first_layer_name,TILE_SCALING)
 
 
         # read in the tiled map
@@ -387,6 +398,7 @@ class MyGame(arcade.Window):
         # Draw our sprites (add background, dont touch and foreground)
         self.wall_list.draw()
         self.background_list.draw()
+        self.onlylayerlist.draw()
         self.foreground_list.draw()
         self.dont_touch_list.draw()
         #self.lava_list.draw()
@@ -667,6 +679,18 @@ class MyGame(arcade.Window):
             self.view_bottom = 0
             changed = True
 
+            if self.player_sprite.center_x >= self.end_of_map:
+                # Advance to the next level
+                self.level2 += 1
+                # load the next level
+                self.setup(self.level2)
+                # Set the camera to the start
+                self.view_left = 0
+                self.view_bottom = 0
+                changed = True
+
+
+
         # Scroll left
         left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
         if self.player_sprite.left < left_boundary:
@@ -708,6 +732,7 @@ def main():
     """ Main method """
     window = MyGame()
     window.setup(window.level)
+
     arcade.run()
 
 
