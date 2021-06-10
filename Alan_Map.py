@@ -43,8 +43,8 @@ RIGHT_VIEWPORT_MARGIN = 250
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 
-PLAYER_START_X = 64
-PLAYER_START_Y = 225
+PLAYER_START_X = 300
+PLAYER_START_Y = 400
 
 # For Explosion
 EXPLOSION_TEXTURE_COUNT = 60
@@ -261,9 +261,8 @@ class MyGame(arcade.Window):
         #self.player_list1.append(self.player_sprite1)
 
         ## --- load in a map from the tilled editor
-
         #map_name = ":resources:tmx_maps/map.tmx"
-        platform_layer_name = "Platforms"
+        platform_layer_name = "ground"
         coins_layer_name = "Coins"
         #Name of the layer that has items for foreground
         foreground_layer_name = "Foreground"
@@ -273,10 +272,13 @@ class MyGame(arcade.Window):
         dont_touch_layer_name = "Don't Touch"
 
         # MAp name
-        map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
+        #map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
+        #map_name = "map2_level_2.tmx"
+        map_name = f"map2_level_{self.level}.tmx"
+        map_path =  map_name
 
         # read in the tiled map
-        my_map = arcade.tilemap.read_tmx(map_name)
+        my_map = arcade.tilemap.read_tmx(str(map_name))
 
         # calculate the right edge of my_map
         self.end_of_map = my_map.map_size.width * GRID_PIXEL_SIZE

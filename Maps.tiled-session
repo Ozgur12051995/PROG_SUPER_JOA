@@ -22,27 +22,49 @@
             }
         },
         "map2_level_1.tmx": {
-            "scale": 0.151591796875,
-            "selectedLayer": 3,
+            "scale": 0.15,
+            "selectedLayer": -1,
             "viewCenter": {
-                "x": 2562.8035817818723,
-                "y": 1091.747729176061
+                "x": 2653.3333333333335,
+                "y": 1013.3333333333333
             }
         },
         "map2_level_1.tmx#tileset": {
+            "scaleInDock": 0.315
+        },
+        "map2_level_2.tmx": {
+            "scale": 0.1572,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2099.236641221374,
+                "y": 1393.1297709923665
+            }
+        },
+        "map2_level_2.tmx#tiles": {
             "scaleInDock": 1
         },
         "map2_level_3.tmx": {
-            "scale": 0.11,
-            "selectedLayer": 1,
+            "scale": 0.1101,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 2113.636363636364,
-                "y": 1013.6363636363637
+                "x": 3487.7384196185285,
+                "y": 2643.051771117166
             }
         },
         "map2_level_3.tmx#nksenvka": {
             "dynamicWrapping": true,
-            "scaleInDock": 0.2932
+            "scaleInDock": 0.3497
+        },
+        "map2_level_4.tmx": {
+            "scale": 0.0967,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2812.8231644260604,
+                "y": 2461.220268872803
+            }
+        },
+        "map2_level_4.tmx#bla": {
+            "scaleInDock": 1
         }
     },
     "last.imagePath": "/Users/giacomo/Documents/GitHub/Programming_Platformer/Super_JOA/images/alien",
@@ -56,6 +78,8 @@
     ],
     "project": "Maps.tiled-project",
     "recentFiles": [
+        "map2_level_4.tmx",
+        "map2_level_2.tmx",
         "assets/MyMap.tmx",
         "Map10_level1.tsx"
     ],

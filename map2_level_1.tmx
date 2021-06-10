@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="40" height="17" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#442045" nextlayerid="11" nextobjectid="1">
+<map version="1.5" tiledversion="1.7.0" orientation="orthogonal" renderorder="right-down" width="40" height="17" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#442045" nextlayerid="14" nextobjectid="1">
  <tileset firstgid="1" name="tileset" tilewidth="128" tileheight="128" tilecount="166" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
@@ -546,11 +546,6 @@
    <image width="128" height="128" source="images/items/star.png"/>
   </tile>
  </tileset>
- <layer id="6" name="Platforms" width="40" height="17">
-  <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjILBA1xxsEcBKnAEYh8odiJC/WhYEgcKgLgQiIvwqBkNy8EBvBkQeYBSjA4oNc8XiG1HMUUYAGcUIUM=
-  </data>
- </layer>
  <layer id="7" name="Coins" width="40" height="17">
   <data encoding="base64" compression="zlib">
    eJxjYBgFo2DoghUD7YBRMGzBaNqiHRgN2+EDRuNyFNAKAAAbowKh
@@ -569,6 +564,11 @@
  <layer id="10" name="Background" width="40" height="17">
   <data encoding="base64" compression="zlib">
    eJxjYBgFo2AUjIJRMApGwSjADfzorG8UjAIAeE8AnQ==
+  </data>
+ </layer>
+ <layer id="13" name="ground" width="40" height="17">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjILBAzxwsEcBKnAEYh8odiJC/WhYEgfykTAuMBqWgwP4UBHTwuz0UUwRBgDduC5p
   </data>
  </layer>
 </map>
