@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.0" orientation="orthogonal" renderorder="right-down" width="40" height="17" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#442045" nextlayerid="14" nextobjectid="1">
+<map version="1.5" tiledversion="1.7.0" orientation="orthogonal" renderorder="right-down" width="40" height="17" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#442045" nextlayerid="15" nextobjectid="1">
  <tileset firstgid="1" name="tileset" tilewidth="128" tileheight="128" tilecount="166" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
@@ -551,9 +551,9 @@
    eJxjYBgFo2DoghUD7YBRMGzBaNqiHRgN2+EDRuNyFNAKAAAbowKh
   </data>
  </layer>
- <layer id="8" name="Don't Touch" width="40" height="17">
+ <layer id="14" name="Don't touch" width="40" height="17">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIJRMApGwSgYucAUDY+CgQcAVEcA1Q==
+   eJxjYBgFo2AUjIJRMApGwSgYucAYDY+CgQcAR9cAzQ==
   </data>
  </layer>
  <layer id="9" name="Foreground" width="40" height="17">

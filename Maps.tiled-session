@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "map2_level_3.tmx",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -21,12 +21,16 @@
                 "y": 3227.7777777777774
             }
         },
+        "assets/arcade_platformer.tsx": {
+            "scaleInDock": 0.0639,
+            "scaleInEditor": 0.19
+        },
         "map2_level_1.tmx": {
             "scale": 0.15,
             "selectedLayer": -1,
             "viewCenter": {
                 "x": 2653.3333333333335,
-                "y": 1013.3333333333333
+                "y": 1000
             }
         },
         "map2_level_1.tmx#tileset": {
@@ -34,21 +38,21 @@
         },
         "map2_level_2.tmx": {
             "scale": 0.1572,
-            "selectedLayer": 0,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 2099.236641221374,
-                "y": 1393.1297709923665
+                "x": 2519.083969465649,
+                "y": 1520.356234096692
             }
         },
         "map2_level_2.tmx#tiles": {
-            "scaleInDock": 1
+            "scaleInDock": 0.2183
         },
         "map2_level_3.tmx": {
-            "scale": 0.1101,
-            "selectedLayer": 3,
+            "scale": 0.1016,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 3487.7384196185285,
-                "y": 2643.051771117166
+                "x": 2913.3858267716537,
+                "y": 3444.8818897637793
             }
         },
         "map2_level_3.tmx#nksenvka": {
@@ -60,7 +64,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 2812.8231644260604,
-                "y": 2461.220268872803
+                "y": 2306.101344364012
             }
         },
         "map2_level_4.tmx#bla": {
@@ -75,11 +79,19 @@
     "map.tileWidth": 128,
     "map.width": 50,
     "openFiles": [
+        "assets/arcade_platformer.tsx",
+        "map2_level_3.tmx",
+        "map2_level_1.tmx",
+        "map2_level_2.tmx",
+        "map2_level_4.tmx"
     ],
     "project": "Maps.tiled-project",
     "recentFiles": [
+        "assets/arcade_platformer.tsx",
         "map2_level_4.tmx",
         "map2_level_2.tmx",
+        "map2_level_1.tmx",
+        "map2_level_3.tmx",
         "assets/MyMap.tmx",
         "Map10_level1.tsx"
     ],
