@@ -6,7 +6,7 @@ import random
 import math
 import PIL
 from arcade.draw_commands import Texture
-
+#
 # Constants
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
@@ -19,7 +19,6 @@ TILE_SCALING = 0.5
 COIN_SCALING = 0.5
 SPRITE_LASER_SCALING = 0.8
 
-##
 
 BULLET_SPEED = 5
 ##map indicators
@@ -29,12 +28,6 @@ GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE*TILE_SCALING)
 SPRITE_SIZE = int(SPRITE_PIXEL_SIZE*TILE_SCALING)
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 5
-UPDATES_PER_FRAME = 5
-
-# Constant used to track if the player is facing left or right
-RIGHT_FACING = 0
-LEFT_FACING = 1
-
 GRAVITY = 1
 PLAYER_JUMP_SPEED = 20
 
@@ -51,62 +44,6 @@ PLAYER_START_Y = 225
 # For Explosion
 
 EXPLOSION_TEXTURE_COUNT = 60
-
-
-def load_texture_pair(filename):
-    """ Load a texture pair with the second being a mirror image.
-    """
-    return[
-        arcade.load_texture(filename),
-        arcade.load_texture(filename, flipped_horizontally=True)
-    ]
-
-class PlayerCharacter(arcade.Sprite):
-    def __init__(self):
-        super().__init__()
-        # Default to face-right
-        self.character_face_direction = RIGHT_FACING
-
-        self.cur_texture = 0
-
-        # for flipping between image sequences
-        self.scale = CHARACTER_SCALING
-
-        ## BE CAREFULLL
-        self.points = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
-
-        # IMAGES
-        main_path = ":resources:images/animated_characters/female_adventurer/femaleAdventurer"
-
-        # load textures for idle standing
-        self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
-
-        # load texture for walking
-        self.walk_textures = []
-        for i in range(8):
-            texture = load_texture_pair(f"{main_path}_walk{i}.png")
-            self.walk_textures.append(texture)
-    def update_animation(self, delta_time: float = 1/60):
-        # figure out if we need to flip face left or right
-        if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
-            self.character_face_direction = LEFT_FACING
-        elif self.change_x > 0 and self.character_face_direction == LEFT_FACING:
-            self.character_face_direction = RIGHT_FACING
-        # idle animation
-
-        if self.change_x == 0 and self.change_y == 0:
-            self.texture = self.idle_texture_pair[self.character_face_direction]
-
-
-        # Walking animation
-        self.cur_texture += 1
-        if self.cur_texture > 7 * UPDATES_PER_FRAME:
-            self.cur_texture = 0
-        frame = self.cur_texture // UPDATES_PER_FRAME
-        direction = self.character_face_direction
-        self.texture = self.walk_textures[frame][direction]
-
-
 
 class Explosion(arcade.Sprite):
     """ This class is for explosion animation
@@ -129,10 +66,10 @@ class MyGame(arcade.Window):
     Main application class.
     """
 
-    def __init__(self, width, height, title):
+    def __init__(self):
 
         # Call the parent class and set up the window
-        super().__init__(width,height,title)
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
@@ -143,8 +80,7 @@ class MyGame(arcade.Window):
         self.player_list = None
         #self.player_list1 = None
         self.enemy_list = None
-        self.bullet_list = None
-        self.player = None
+        self.bullet_list = None # gun
 
         # Explosion
         self.explosion_list = None
@@ -175,7 +111,7 @@ class MyGame(arcade.Window):
 
 
         # Separate variable that holds the player sprite
-        #self.player_sprite = None
+        self.player_sprite = None
         #self.player_sprite1 = None
 
         # Our physics engine
@@ -192,6 +128,7 @@ class MyGame(arcade.Window):
         self.level = 1
 
         # Load sounds (+ Game over + gun sound)
+
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
@@ -231,16 +168,11 @@ class MyGame(arcade.Window):
 
 
         # Set up the player, specifically placing it at these coordinates.
-        #image_source = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
-        #self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
-        #self.player_sprite.center_x = PLAYER_START_X
-        #self.player_sprite.center_y = PLAYER_START_Y
-        #self.player_list.append(self.player_sprite)
-
-        self.player = PlayerCharacter()
-        self.player.center_x = PLAYER_START_X
-        self.player.center_y = PLAYER_START_Y
-        self.player_list.append(self.player)
+        image_source = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
+        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        self.player_sprite.center_x = PLAYER_START_X
+        self.player_sprite.center_y = PLAYER_START_Y
+        self.player_list.append(self.player_sprite)
 
         # sprite 2
        # image_source1 = "images/player_1/player_stand.png"
@@ -302,7 +234,7 @@ class MyGame(arcade.Window):
 
         # Create "physic engine"
 
-        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player, self.wall_list, GRAVITY)
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite, self.wall_list, GRAVITY)
 
         # Add items
         #coin = arcade.Sprite("images/items/coinBronze.png", TILE_SCALING)
@@ -464,8 +396,8 @@ class MyGame(arcade.Window):
         bullet = arcade.Sprite(":resources:images/space_shooter/laserBlue01.png",SPRITE_LASER_SCALING)
 
         # POSITION THE BULLET
-        start_x = self.player.center_x
-        start_y = self.player.center_y
+        start_x = self.player_sprite.center_x
+        start_y = self.player_sprite.center_y
 
         bullet.center_x = start_x
         bullet.center_y = start_y
@@ -500,20 +432,20 @@ class MyGame(arcade.Window):
 
         if key == arcade.key.UP or key == arcade.key.W or key == arcade.key.SPACE: # we can jump either with W or space or UP
             if self.physics_engine.can_jump():
-                self.player.change_y = PLAYER_JUMP_SPEED
+                self.player_sprite.change_y = PLAYER_JUMP_SPEED
                 arcade.play_sound(self.jump_sound)
         elif key == arcade.key.LEFT or key == arcade.key.A:
-            self.player.change_x = -PLAYER_MOVEMENT_SPEED
+            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
         elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.player.change_x = PLAYER_MOVEMENT_SPEED
+            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
 
         if key == arcade.key.LEFT or key == arcade.key.A:
-            self.player.change_x = 0
+            self.player_sprite.change_x = 0
         elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.player.change_x = 0
+            self.player_sprite.change_x = 0
 
     def on_update(self, delta_time):
         """ Movement and game logic """
@@ -521,8 +453,6 @@ class MyGame(arcade.Window):
         # update time
 
         self.total_time += delta_time
-
-        self.player_list.update_animation()
 
         # Move the player with the physics engine
         self.physics_engine.update()
@@ -542,7 +472,7 @@ class MyGame(arcade.Window):
 
 
         # See if we hit any coins
-        coin_hit_list = arcade.check_for_collision_with_list(self.player,
+        coin_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
                                                              self.coin_list)
         # Loop through each coin we hit (if any) and remove it
         for coin in coin_hit_list:
@@ -602,9 +532,9 @@ class MyGame(arcade.Window):
 
         ## Did The player fall of the map ?
 
-        if self.player.center_y < -100:
-            self.player.center_x = PLAYER_START_X
-            self.player.center_y = PLAYER_START_Y
+        if self.player_sprite.center_y < -100:
+            self.player_sprite.center_x = PLAYER_START_X
+            self.player_sprite.center_y = PLAYER_START_Y
             # set the camera to the start
             self.view_left = 0
             self.view_bottom = 0
@@ -612,11 +542,11 @@ class MyGame(arcade.Window):
             arcade.play_sound(self.game_over)
 
         # Did player touched smt that they should not
-        if arcade.check_for_collision_with_list(self.player,self.dont_touch_list):
-            self.player.change_x=0
-            self.player.change_y = 0
-            self.player.center_x = PLAYER_START_X
-            self.player.center_y = PLAYER_START_Y
+        if arcade.check_for_collision_with_list(self.player_sprite,self.dont_touch_list):
+            self.player_sprite.change_x=0
+            self.player_sprite.change_y = 0
+            self.player_sprite.center_x = PLAYER_START_X
+            self.player_sprite.center_y = PLAYER_START_Y
             # Set the camera to the start
 
             self.view_left=0
@@ -625,7 +555,7 @@ class MyGame(arcade.Window):
             arcade.play_sound(self.game_over)
 
         # See if the user got the end of the level
-        if self.player.center_x >= self.end_of_map:
+        if self.player_sprite.center_x >= self.end_of_map:
             # Advance to the next level
             self.level +=1
             # load the next level
@@ -637,26 +567,26 @@ class MyGame(arcade.Window):
 
         # Scroll left
         left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
-        if self.player.left < left_boundary:
-            self.view_left -= left_boundary - self.player.left
+        if self.player_sprite.left < left_boundary:
+            self.view_left -= left_boundary - self.player_sprite.left
             changed = True
 
         # Scroll right
         right_boundary = self.view_left + SCREEN_WIDTH - RIGHT_VIEWPORT_MARGIN
-        if self.player.right > right_boundary:
-            self.view_left += self.player.right - right_boundary
+        if self.player_sprite.right > right_boundary:
+            self.view_left += self.player_sprite.right - right_boundary
             changed = True
 
         # Scroll up
         top_boundary = self.view_bottom + SCREEN_HEIGHT - TOP_VIEWPORT_MARGIN
-        if self.player.top > top_boundary:
-            self.view_bottom += self.player.top - top_boundary
+        if self.player_sprite.top > top_boundary:
+            self.view_bottom += self.player_sprite.top - top_boundary
             changed = True
 
         # Scroll down
         bottom_boundary = self.view_bottom + BOTTOM_VIEWPORT_MARGIN
-        if self.player.bottom < bottom_boundary:
-            self.view_bottom -= bottom_boundary - self.player.bottom
+        if self.player_sprite.bottom < bottom_boundary:
+            self.view_bottom -= bottom_boundary - self.player_sprite.bottom
             changed = True
 
         if changed:
@@ -672,10 +602,9 @@ class MyGame(arcade.Window):
                                 SCREEN_HEIGHT + self.view_bottom)
 
 
-
 def main():
     """ Main method """
-    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window = MyGame()
     window.setup(window.level)
     arcade.run()
 

@@ -1,11 +1,12 @@
 """
-Platformer Game
+Super JOA
 """
 import arcade
 import random
 import math
 import PIL
 from arcade.draw_commands import Texture
+from classes import *
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -27,9 +28,11 @@ GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE*TILE_SCALING)
 
 SPRITE_SIZE = int(SPRITE_PIXEL_SIZE*TILE_SCALING)
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 5
-GRAVITY = 1
-PLAYER_JUMP_SPEED = 20
+PLAYER_MOVEMENT_SPEED = 3
+
+########
+GRAVITY = 0.8
+PLAYER_JUMP_SPEED = 15
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -38,12 +41,21 @@ RIGHT_VIEWPORT_MARGIN = 250
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 
-PLAYER_START_X = 64
-PLAYER_START_Y = 225
+PLAYER_START_X = 400
+PLAYER_START_Y = 500
 
 # For Explosion
-
 EXPLOSION_TEXTURE_COUNT = 60
+
+def load_texture_pair(filename):
+     """
+     Load a texture pair, with the second being a mirror image.
+     """
+     return [
+         arcade.load_texture(filename),
+         arcade.load_texture(filename, flipped_horizontally=True)
+     ]
+
 
 
 
@@ -51,6 +63,7 @@ class MyGame(arcade.Window):
     """
     Main application class.
     """
+
     def __init__(self):
 
         # Call the parent class and set up the window
@@ -66,9 +79,13 @@ class MyGame(arcade.Window):
         #self.player_list1 = None
         self.enemy_list = None
         self.bullet_list = None # gun
+        self.bullet_enemy_list = None
 
         # Explosion
         self.explosion_list = None
+
+        # Enemies that shoot me
+        self.frame_count = 0
 
         # Dont show the mouse cursor
         #self.set_mouse_visible(False)
@@ -84,6 +101,7 @@ class MyGame(arcade.Window):
         # Load the explosion from a sprite sheet
         self.explosion_texture_list = arcade.load_spritesheet(file_name, sprite_width,sprite_height,columns,count)
 
+
         ## FOREGROUND, BACKGROUND , DO NOT TOUCH LIST
 
         self.background_list = None
@@ -92,8 +110,11 @@ class MyGame(arcade.Window):
 
         # Keep track of the score (Özgür)
         self.score = 0
+
+
         # Separate variable that holds the player sprite
         self.player_sprite = None
+        #self.player_sprite1 = None
 
         # Our physics engine
         self.physics_engine = None
@@ -146,33 +167,47 @@ class MyGame(arcade.Window):
         self.background_list = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
         self.explosion_list = arcade.SpriteList()
+        self.bullet_enemy_list = arcade.SpriteList()
 
 
         # Set up the player, specifically placing it at these coordinates.
-        image_source = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
-        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        #image_source = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
+        #self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        #self.player_sprite.center_x = PLAYER_START_X
+        #self.player_sprite.center_y = PLAYER_START_Y
+        #self.player_list.append(self.player_sprite)
+
+        self.player_sprite = PlayerCharacter()
         self.player_sprite.center_x = PLAYER_START_X
         self.player_sprite.center_y = PLAYER_START_Y
         self.player_list.append(self.player_sprite)
 
+        # sprite 2
+       # image_source1 = "images/player_1/player_stand.png"
+        #self.player_sprite1 = arcade.Sprite(image_source1, CHARACTER_SCALING)
+        #self.player_sprite1.center_x = 200
+        #self.player_sprite1.center_y = 180
+        #self.player_list1.append(self.player_sprite1)
 
         ## --- load in a map from the tilled editor
-
         #map_name = ":resources:tmx_maps/map.tmx"
-        platform_layer_name = "Platforms"
+        platform_layer_name = "ground"
         coins_layer_name = "Coins"
         #Name of the layer that has items for foreground
         foreground_layer_name = "Foreground"
         # Name of the layer that has items for background
         background_layer_name = "Background"
         # name of the layer that has items we should not touch
-        dont_touch_layer_name = "Don't Touch"
+        dont_touch_layer_name = "Don't touch"
 
         # MAp name
-        map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
+        #map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
+        #map_name = "map2_level_2.tmx"
+        map_name = f"map2_level_{self.level}.tmx"
+        map_path =  map_name
 
         # read in the tiled map
-        my_map = arcade.tilemap.read_tmx(map_name)
+        my_map = arcade.tilemap.read_tmx(str(map_name))
 
         # calculate the right edge of my_map
         self.end_of_map = my_map.map_size.width * GRID_PIXEL_SIZE
@@ -183,16 +218,21 @@ class MyGame(arcade.Window):
         # -- Foreground
         self.foreground_list = arcade.tilemap.process_layer(my_map,foreground_layer_name,TILE_SCALING)
 
+
+
         # read in the tiled map
-        #my_map = arcade.tilemap.read_tmx(map_name)
+        my_map = arcade.tilemap.read_tmx(map_name)
 
         # Platforms
+
         self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
                                                       layer_name=platform_layer_name,
                                                       scaling=TILE_SCALING,
                                                       use_spatial_hash=True)
+
         # Coins
         self.coin_list = arcade.tilemap.process_layer(my_map, coins_layer_name, TILE_SCALING, use_spatial_hash=True)
+
 
         # --- Dont touch layer
 
@@ -236,20 +276,32 @@ class MyGame(arcade.Window):
 
         # ADD SOME ENEMY MOVING
 
-        enemy = arcade.Sprite(":resources:images/enemies/wormGreen.png", TILE_SCALING)
+        #enemy = arcade.Sprite(":resources:images/enemies/wormGreen.png", TILE_SCALING)
 
-        enemy.bottom = SPRITE_SIZE
-        enemy.left = SPRITE_SIZE*2
+        #enemy.bottom = SPRITE_SIZE*2
+        #enemy.left = SPRITE_SIZE*2
 
         # Gİve some speed
-        enemy.change_x = 2
-        self.enemy_list.append(enemy)
+        #enemy.change_x = 2
+        #self.enemy_list.append(enemy)
 
         # Enemy on the plateform
 
+        # Bee top left
+
         enemy = arcade.Sprite("images/enemies/bee.png")
-        enemy.bottom = SPRITE_SIZE*4
-        enemy.left = SPRITE_SIZE*4
+        enemy.center_x = 120
+        enemy.center_y = SCREEN_HEIGHT-enemy.height
+        enemy.angle= 180
+        self.enemy_list.append(enemy)
+
+        # Add enemy ship (top right)
+        enemy = arcade.Sprite(":resources:images/space_shooter/playerShip1_green.png",0.5)
+        enemy.center_x = SCREEN_WIDTH-120
+        enemy.center_y = SCREEN_HEIGHT - enemy.height
+        enemy.angle = 180
+        self.enemy_list.append(enemy)
+
 
         # Boundaries
 
@@ -257,6 +309,64 @@ class MyGame(arcade.Window):
         enemy.boundary_left = SPRITE_SIZE *3
         enemy.change_x = 2
         self.enemy_list.append(enemy)
+
+
+        # Add enemey - bee
+        #for x in range(100, 1000, 250):
+            #bee = arcade.Sprite(":resources:images/enemies/bee.png", TILE_SCALING)
+            #bee.center_x = x
+            #bee.center_y = 600
+            #self.enemey_list.append(bee)
+
+        # Add more enemeys
+        #coordinate_list1 = [[256, 250],
+                           #[512, 250],
+                           #[768, 250]]
+
+        #for coordinate in coordinate_list1:
+            # Add a crate on the ground
+            #frog = arcade.Sprite("images/enemies/frog.png", TILE_SCALING)
+            #frog.position = coordinate
+           # self.enemey_list.append(frog)
+
+
+
+
+        # Create the ground
+        # This shows using a loop to place multiple sprites horizontally
+        #for x in range(100, 3000, 64):
+            #wall = arcade.Sprite(":resources:images/tiles/grassMid.png", TILE_SCALING)
+            #wall.center_x = x
+            #wall.center_y = 100
+            #self.wall_list.append(wall)
+
+        # Put some crates on the ground
+        # This shows using a coordinate list to place sprites
+        #coordinate_list = [[256, 160],
+                           #[512, 160],
+                           #[768, 160]]
+
+        #for coordinate in coordinate_list:
+            # Add a crate on the ground
+            #wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", TILE_SCALING)
+            #wall.position = coordinate
+            #self.wall_list.append(wall)
+
+            # The floor is lava!!!
+            # This shows using a loop to place multiple sprites horizontally
+            # Put some lava on the ground
+            # This shows using a coordinate list to place sprites
+        #for x in range(0, 3000, 64):
+            #lava = arcade.Sprite(":resources:images/tiles/lavaTop_high.png", TILE_SCALING)
+            #lava.center_x = x
+            #lava.center_y = 1
+            #self.wall_list.append(lava)
+
+        # Create the 'physics engine'
+        #self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
+                                                             #self.wall_list,
+                                                             #GRAVITY)
+        ## Timers
 
         self.total_time = 0.0
 
@@ -293,6 +403,7 @@ class MyGame(arcade.Window):
         self.explosion_list.draw()
 
         self.bullet_list.draw()
+        self.bullet_enemy_list.draw()
 
         # Draw our score on the screen , scrolling it with the viewport
 
@@ -334,6 +445,11 @@ class MyGame(arcade.Window):
 
         self.bullet_list.append(bullet)
 
+
+
+
+
+
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
 
@@ -364,6 +480,58 @@ class MyGame(arcade.Window):
         # Move the player with the physics engine
         self.physics_engine.update()
         self.explosion_list.update()
+
+
+
+
+        self.frame_count +=1
+
+        for enemy in self.enemy_list:
+            # Position to start at the enemy current location
+            start_xx = enemy.center_x
+            start_yy = enemy.center_y
+
+            # Get the destination location for the bullet
+
+            dest_xx = self.player_sprite.center_x
+            dest_yy = self.player_sprite.center_y
+
+            # Math to calculate how to get bullet to the destination
+
+            xx_diff = dest_xx - start_xx
+            yy_diff = dest_yy - start_yy
+            angle = math.atan2(yy_diff,xx_diff)
+
+            # Set the enemy to the face of the player
+            enemy.angle = math.degrees(angle) - 90
+
+            # Shoot every 60 frames changes
+
+            if self.frame_count % 90 ==0:
+                bullet_enemy = arcade.Sprite(":resources:images/space_shooter/laserBlue01.png")
+                bullet_enemy.center_x = start_xx
+                bullet_enemy.center_y = start_yy
+
+                # Angle the bullet sprite
+                bullet_enemy.angle = math.degrees(angle)
+
+                # TAke into account the angle, calculate our change_x and y
+                bullet_enemy.change_x = math.cos(angle) * BULLET_SPEED
+                bullet_enemy.change_y = math.sin(angle) * BULLET_SPEED
+
+                self.bullet_enemy_list.append(bullet_enemy)
+
+        # Get rid of the bullet_enemy when it flies of the screen
+
+
+
+
+
+
+
+
+
+
 
 
         if not self.game_over:
@@ -411,7 +579,7 @@ class MyGame(arcade.Window):
             if len(hit_enemy) > 0:
                 # Make an explosion
                 explosion = Explosion(self.explosion_texture_list)
-                # Move it to the location of the enemy
+                 #Move it to the location of the enemy
                 explosion.center_x = hit_enemy[0].center_x
                 explosion.center_y = hit_enemy[0].center_y
                 # Call update
@@ -458,8 +626,42 @@ class MyGame(arcade.Window):
 
             self.view_left=0
             self.view_bottom=0
-            changed  =True
+            changed =True
             arcade.play_sound(self.game_over)
+
+        # Did JOA has been shot ?
+        self.bullet_enemy_list.update()
+
+        for bullet_enemy in self.bullet_enemy_list:
+
+            hit_enemy_player = arcade.check_for_collision_with_list(bullet_enemy, self.player_list)
+
+            if len(hit_enemy_player) > 0:
+                # Make an explosion
+                #explosion = Explosion(self.explosion_texture_list)
+                # Move it to the location of the enemy
+                #explosion.center_x = hit_enemy_player[0].
+                #explosion.center_y = hit_enemy_player[0].center_y
+                # Call update
+                #explosion.update()
+                #self.explosion_list.append(explosion)
+
+                arcade.play_sound(self.gun_sound)
+                bullet_enemy.remove_from_sprite_lists()
+
+                #for player in hit_enemy_player:
+                    #arcade.sound.play_sound(self.hit_sound)
+                    #player.remove_from_sprite_lists()
+                if bullet_enemy.bottom > self.width + self.view_bottom or bullet_enemy.top < 0 or bullet_enemy.right < 0 or bullet_enemy.left > self.width + self.view_left:
+                    bullet_enemy.remove_from_sprite_lists()
+
+                self.player_sprite.center_x = PLAYER_START_X
+                self.player_sprite.center_y = PLAYER_START_Y
+                # Set the camera to the start
+                self.view_left = 0
+                self.view_bottom = 0
+                changed = True
+                arcade.play_sound(self.game_over)
 
         # See if the user got the end of the level
         if self.player_sprite.center_x >= self.end_of_map:
@@ -471,6 +673,10 @@ class MyGame(arcade.Window):
             self.view_left = 0
             self.view_bottom = 0
             changed = True
+
+
+        self.player_list.update()
+        self.player_list.update_animation()
 
         # Scroll left
         left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
